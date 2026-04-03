@@ -1,0 +1,10 @@
+{
+  "name": "klett-to-pdf-md",
+  "version": "1.0.0",
+  "description": "Extrahiert Schulbücher aus der Klett Lernen App als PDF und Markdown",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node klett.js"
+  }
+}
