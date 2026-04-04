@@ -1,4 +1,4 @@
-# Klett Lernen Offline-Extraktor
+# Klett — Bücher als PDF und Markdown exportieren
 
 Extrahiert offline heruntergeladene Schulbücher aus der Klett Lernen Desktop-App und erzeugt PDFs, Klartext-/Markdown-Dateien und Zusatzmaterialien (Kopiervorlagen, Tafelbilder).
 Kein OCR — die Buchtexte werden direkt aus dem Klett-Suchindex übernommen. Keine Zugangsdaten nötig, es werden nur die lokal heruntergeladenen Dateien gelesen.
@@ -6,7 +6,7 @@ Die Markdown-Ausgabe eignet sich besonders gut zur Weiterverarbeitung durch KI-M
 
 ## Voraussetzungen
 
-- Klett Lernen Desktop-App (`https://www.klett.de/inhalt/klett-lernen/klett-lernen-app/225`) mit mindestens einem offline heruntergeladenen Buch
+- Klett Lernen Desktop-App (`https://www.klett.de/inhalt/klett-lernen/158307`) mit mindestens einem offline heruntergeladenen Buch
 
 ## Download (empfohlen)
 
