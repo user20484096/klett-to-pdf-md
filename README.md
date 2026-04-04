@@ -1,142 +1,95 @@
-# klett-to-pdf-md
+# Klett Lernen Offline-Extraktor
 
-Extrahiert offline heruntergeladene Schulbücher aus der **Klett Lernen** Desktop-App (macOS + Windows) als PDF + Text/Markdown.
-
-## Was wird extrahiert?
-
-- **PDF** — das eingebettete ePaper-PDF (mit Text-Layer, durchsuchbar)
-- **Volltext** — Seitentext aus dem Suchindex als `.txt` (oder `.md` mit `--markdown`)
-- **Zusatzmaterial** — Kopiervorlagen (.docx), Lösungen, Tafelbilder (.xml), jeweils auch als Markdown
+Extrahiert offline heruntergeladene Schulbücher aus der Klett Lernen Desktop-App und erzeugt PDFs, Klartext-/Markdown-Dateien und Zusatzmaterialien (Kopiervorlagen, Tafelbilder).
+Kein OCR — die Buchtexte werden direkt aus dem Klett-Suchindex übernommen. Keine Zugangsdaten nötig, es werden nur die lokal heruntergeladenen Dateien gelesen.
+Die Markdown-Ausgabe eignet sich besonders gut zur Weiterverarbeitung durch KI-Modelle.
 
 ## Voraussetzungen
 
-- **Node.js** >= 18 (siehe [Installation](#node-installieren))
-- **Klett Lernen App** installiert, mindestens ein Buch **offline heruntergeladen**
-- Keine `npm install` nötig — das Script hat keine Abhängigkeiten
+- Klett Lernen Desktop-App (`https://www.klett.de/inhalt/klett-lernen/klett-lernen-app/225`) mit mindestens einem offline heruntergeladenen Buch
 
-## Node installieren
+## Download (empfohlen)
 
-### macOS
+Unter [Releases](../../releases) stehen fertige Executables zum Download — keine Installation von Python oder Node.js nötig:
 
-```bash
-# Option 1: Homebrew (empfohlen)
-brew install node
+- **macOS**: `klett-macos.zip` — entpacken, dann im Terminal `./klett` ausführen
+- **Windows**: `klett.exe` — direkt ausführen oder ins Terminal ziehen
 
-# Option 2: Installer von https://nodejs.org herunterladen (LTS-Version)
-```
+### macOS: Gatekeeper-Warnung
 
-### Windows
+macOS blockiert unsignierte Programme. Beim ersten Start:
 
-1. **https://nodejs.org** aufrufen
-2. Die **LTS-Version** (grüner Button) herunterladen und installieren
-3. Bei der Installation den Haken bei **"Add to PATH"** gesetzt lassen
-4. Nach der Installation ein neues Terminal (CMD oder PowerShell) öffnen
-5. Prüfen: `node --version` sollte `v18.x` oder höher anzeigen
+1. Doppelklick auf `klett` → "kann nicht geöffnet werden" Meldung
+2. **Systemeinstellungen → Datenschutz & Sicherheit** → nach unten scrollen
+3. Bei "klett wurde blockiert" auf **Trotzdem öffnen** klicken
 
-Alternativ über **winget** (Windows 10/11):
+Alternativ im Terminal: `xattr -cr klett && ./klett`
 
-```powershell
-winget install OpenJS.NodeJS.LTS
-```
+### Windows: SmartScreen-Warnung
 
-## Verwendung
+Beim ersten Start erscheint "Der Computer wurde durch Windows geschützt":
 
-### macOS (Terminal)
+1. Auf **Weitere Informationen** klicken
+2. **Trotzdem ausführen** klicken
+
+## Alternative: Python oder Node.js
+
+### uv (Python)
 
 ```bash
-# In den Projektordner wechseln
-cd klett-to-pdf-md
+# uv installieren (macOS / Linux)
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Alle Bücher extrahieren
-node klett.js
+# uv installieren (Windows)
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 
-# Markdown statt Text
-node klett.js --markdown
+# Ausführen — uv installiert Python automatisch (keine Dependencies nötig)
+uv run klett.py
 ```
 
-### Windows (PowerShell oder CMD)
+### Node.js
 
-```powershell
-# In den Projektordner wechseln
-cd klett-to-pdf-md
-
-# Alle Bücher extrahieren
-node klett.js
-
-# Markdown statt Text
-node klett.js --markdown
+```bash
+npm install && node klett.js
 ```
 
-Falls `node` nicht gefunden wird: Terminal schließen und neu öffnen (PATH wird erst nach Neustart der Shell geladen).
+## Optionen
 
-### Optionen
+| Flag | Beschreibung |
+|------|-------------|
+| `--output <dir>` | Ausgabeverzeichnis (Standard: `./books`) |
+| `--book <DUA-ID>` | Nur ein bestimmtes Buch (z.B. `--book DUA-66SHLYDVUZ`) |
+| `--no-materials` | Ohne Zusatzmaterialien |
+| `--markdown` | Volltext als .md statt .txt |
+| `--force` | Vorhandene Bücher überschreiben |
 
-```
-node klett.js                         # Alle Bücher, Volltext als .txt
-node klett.js --markdown              # Volltext als .md statt .txt
-node klett.js --book DUA-66SHLYDVUZ   # Einzelnes Buch (DUA-ID aus der Ausgabe)
-node klett.js --output ./meinordner   # Ausgabeverzeichnis festlegen
-node klett.js --no-materials          # Ohne Zusatzmaterialien
-node klett.js --force                 # Vorhandene Dateien überschreiben
-```
+## Ausgabe
 
-## Buch offline herunterladen
-
-Bevor das Script funktioniert, muss das Buch in der Klett Lernen App offline verfügbar sein:
-
-1. **Klett Lernen App** öffnen und einloggen
-2. Buch auswählen
-3. Auf das **Download-Symbol** (Wolke/Pfeil nach unten) klicken
-4. Warten bis der Download abgeschlossen ist
-5. Erst dann das Script ausführen
-
-## Ausgabestruktur
-
-```
+```text
 books/
-└── Buchtitel (DUA-XXXXXXXX)/
-    ├── Buchtitel.pdf          # ePaper-PDF mit Text-Layer
-    ├── Buchtitel.txt          # Volltext (Klartext, seitenweise)
-    ├── Zusatzmaterial.md      # Index aller Materialien
-    └── Zusatzmaterial/
-        ├── kv/                # Kopiervorlagen (.docx + .md)
-        ├── kv_extra/          # Lösungen (.docx + .md)
-        └── tbi/               # Tafelbilder (.xml + .md)
+  Buchtitel (DUA-XXXXXXXX)/
+    Buchtitel.pdf          — ePaper-PDF mit Text-Layer
+    Buchtitel.txt          — Klartext aller Seiten
+    Zusatzmaterial.md      — Übersicht Zusatzmaterialien
+    Zusatzmaterial/
+      kv/                  — Kopiervorlagen (.docx + .md)
+      kv_extra/            — Lösungen (.docx + .md)
+      tbi/                 — Tafelbilder (.xml + .md)
 ```
 
-Mit `--markdown` wird statt `Buchtitel.txt` eine `Buchtitel.md` erzeugt.
+## Wie funktioniert es?
 
-## Datenpfade
+Die Klett Lernen App speichert offline heruntergeladene Bücher **unverschlüsselt**:
 
-Das Script sucht die Klett-Daten automatisch am richtigen Ort:
+1. **ePaper-PDF** — Vollständiges Buch als PDF direkt im App-Container
+2. **Suchindex** — `search.xml` mit Volltext pro Seite
+3. **Materialien** — Kopiervorlagen (.docx), Lösungen, Tafelbilder (.xml)
+4. **DOCX-Konvertierung** — automatisch per `textutil` (macOS) oder Word COM (Windows)
 
-| Plattform | Pfad |
+## Plattform-Unterstützung
+
+| Plattform | Klett-Daten |
 |---|---|
 | macOS | `~/Library/Containers/de.klett.dua.schueler/.../Klett/klett_lernen/` |
 | Windows (Desktop) | `%LOCALAPPDATA%\Klett\klett_lernen\` |
 | Windows (Store) | `%LOCALAPPDATA%\Packages\*klett*\LocalState\Klett\klett_lernen\` |
-
-Falls das Script den Pfad nicht findet, zeigt es den erwarteten Pfad in der Fehlermeldung an.
-
-## Wie funktioniert es?
-
-Die Klett Lernen App speichert offline heruntergeladene Bücher unverschlüsselt:
-
-| Datei | Inhalt |
-|---|---|
-| `content/media/ep-*/epaper.pdf` | Vollständiges Buch als PDF |
-| `content/media/ep-*/content/search.xml` | Suchindex mit Volltext pro Seite |
-| `content/media/kv/*.docx` | Kopiervorlagen (Word) |
-| `content/media/kv_extra/*.docx` | Lösungen (Word) |
-| `content/media/tbi/*.xml` | Tafelbilder (XML mit HTML-Inhalt) |
-
-### DOCX-zu-Text-Konvertierung
-
-Kopiervorlagen (.docx) werden automatisch nach Markdown konvertiert:
-
-| Plattform | Methode |
-|---|---|
-| macOS | `textutil` (vorinstalliert, keine Zusatzinstallation) |
-| Windows | PowerShell + Word COM-Objekt (Microsoft Word muss installiert sein) |
-
-Ohne Word auf Windows werden die .docx-Dateien trotzdem kopiert, nur die Markdown-Konvertierung entfällt.
